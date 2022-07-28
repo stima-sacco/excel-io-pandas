@@ -29,13 +29,20 @@ class data_cleanup(object):
             'Branch_Code'
         ]
 
-        self.create_branch_folders_if()
+        #self.create_branch_folders_if()
 
+        print('START...')
         for fl in os.listdir(self.output_folders_source_url):
-            file = ''.join([self.output_folders_source_url, '\\', fl])
+            source_file_name = ''.join([self.output_folders_source_url, '\\', fl])
+            print(fl + '...')
+            for branch in self.branches:
+                print('    ' + branch + '...')
+                branch_folder_path = ''.join([self.output_folders_destination_url, '\\', branch])
+                if os.path.exists(branch_folder_path) == False:
+                    os.mkdir(branch_folder_path)
 
-            self.create_brach_data_cleanup_output_file(file)
-
+                self.create_brach_data_cleanup_output_file(branch_folder_path, source_file_name)
+        print('FINISHED!')
     def create_branch_folders_if(self):
         for branch in self.branches:
             fld_path = ''.join([self.output_folders_destination_url, '\\', branch])
@@ -67,7 +74,7 @@ class data_cleanup(object):
 
         return return_value
 
-    def create_brach_data_cleanup_output_file(self, source_file_name):
+    def create_brach_data_cleanup_output_file(self, branch_folder_path, source_file_name):
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
 
@@ -78,20 +85,35 @@ class data_cleanup(object):
                 return_value = self.get_valid_column_key(df)
 
                 if return_value['key_found'] == False:
+                    print('Missing Column Headers : ' + source_file_name)
                     break
 
-                valid_id = return_value['valid_id']
-                data_frame = df.loc[df[valid_id] == 'CBD']
+                branch_name = os.path.basename(branch_folder_path)
+                # if branch_name == 'NONBRANCH':
+                #     branch_name = 'NaN'
 
-                
-                writer = pd.ExcelWriter('demo.xls', engine="openpyxl")
+                #print(df)
+                valid_id = return_value['valid_id']
+
+                if branch_name == 'NONBRANCH':
+                    data_frame = df[df[valid_id].isna()]
+                else:
+                    data_frame = df.loc[df[valid_id] == branch_name]
+                #print(data_frame)
+
+                if data_frame.empty:
+                    break
+
+                output_file_name = ''.join([branch_folder_path, '\\', os.path.basename(source_file_name)])
+                writer = pd.ExcelWriter(output_file_name, engine="openpyxl")
                 data_frame.to_excel(writer, sheet_name="Sheet1", index=False)
                 writer.save()
                 break
 
 
 if __name__ == '__main__':
-    output_folders_source_url = r'C:\_python\data_cleanup\Source'
+    output_folders_source_url = r'C:\_Temp\DataCleanup'
+    #output_folders_source_url = r'C:\_python\data_cleanup\Source'
     output_folders_destination_url = r'C:\_python\data_cleanup\Destination'
 
     dc = data_cleanup(
