@@ -12,7 +12,7 @@ branch_column_ids = [
 with warnings.catch_warnings(record=True):
     warnings.simplefilter("always")
     df = pd.read_excel(r'C:\_Temp\DataCleanup\Members_with_Duplicate_P_I_N_NUMBERS.xls', dtype=object, index_col=0)#, engine='openpyxl')
-    #print(df['Branch'])
+
     data_frame = df.loc[df['Branch'] == 'CBD']
 
     writer = pd.ExcelWriter('demo.xls', engine="openpyxl")
