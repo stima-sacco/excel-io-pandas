@@ -45,3 +45,8 @@ class data_cleanup(object):
             writer = pd.ExcelWriter('demo.xls', engine="openpyxl")
             data_frame.to_excel(writer, sheet_name="Sheet1", index=False)
             writer.save()
+
+
+if __name__ == '__main__':
+    base_url = r''
+    dc = data_cleanup(base_url)
