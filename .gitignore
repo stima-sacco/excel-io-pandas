@@ -22,6 +22,16 @@ var/
 wheels/
 pip-wheel-metadata/
 share/python-wheels/
+CBD/*
+ELD/*
+EMB/*
+KAWI/*
+KSM/*
+MSA/*
+NBI/*
+NKR/*
+NONBRANCH/*
+OLK/*
 *.egg-info/
 .installed.cfg
 *.egg
@@ -124,7 +134,7 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
-.xls
-.xlsx
+*.xls
+*.xlsx
 # Pyre type checker
 .pyre/
