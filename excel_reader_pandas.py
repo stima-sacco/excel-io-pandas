@@ -7,6 +7,9 @@ class data_cleanup(object):
         self.output_folders_source_url = output_folders_source_url
         self.output_folders_destination_url = output_folders_destination_url
 
+        f = open('missing-columns.txt', 'w')
+        f.close()
+        
         self.branches = [
             'CBD',
             'ELD',
@@ -17,7 +20,8 @@ class data_cleanup(object):
             'NBI',
             'NKR',
             'NONBRANCH',
-            'OLK'
+            'OLK',
+            'HEAD NB'
         ]
 
         self.branch_column_ids = [
@@ -36,7 +40,7 @@ class data_cleanup(object):
             source_file_name = ''.join([self.output_folders_source_url, '\\', fl])
             print(fl + '...')
             for branch in self.branches:
-                print('    ' + branch + '...')
+                #print('    ' + branch + '...')
                 branch_folder_path = ''.join([self.output_folders_destination_url, '\\', branch])
                 if os.path.exists(branch_folder_path) == False:
                     os.mkdir(branch_folder_path)
@@ -85,21 +89,22 @@ class data_cleanup(object):
                 return_value = self.get_valid_column_key(df)
 
                 if return_value['key_found'] == False:
-                    print('Missing Column Headers : ' + source_file_name)
+                    #print('Missing Column Headers : ' + source_file_name)
+                    f = open('missing-columns.txt', 'a')
+                    f.writelines(source_file_name +"\n")
+                    f.close()
                     break
 
                 branch_name = os.path.basename(branch_folder_path)
                 # if branch_name == 'NONBRANCH':
                 #     branch_name = 'NaN'
 
-                #print(df)
                 valid_id = return_value['valid_id']
 
                 if branch_name == 'NONBRANCH':
                     data_frame = df[df[valid_id].isna()]
                 else:
                     data_frame = df.loc[df[valid_id] == branch_name]
-                #print(data_frame)
 
                 if data_frame.empty:
                     break

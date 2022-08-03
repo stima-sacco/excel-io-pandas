@@ -62,6 +62,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+missing-columns.txt
 
 # Translations
 *.mo
