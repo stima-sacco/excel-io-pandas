@@ -8,39 +8,9 @@ class Form(wx.Frame):
         wx.Frame.__init__(self, parent=None, title='Data Cleanup', size=(720,400))
         self.Pan = wx.Panel(self, -1)
 
-        self.output_folders_source_url = ''
-        self.output_folders_destination_url = ''
-
-        self.source_path_selected = False        
-        self.destination_path_selected = False
         f = open('missing-columns.txt', 'w')
         f.close()
         
-        self.branches = [
-            'CBD',
-            'ELD',
-            'EMB',
-            'KAWI',
-            'KSM',
-            'MSA',
-            'NBI',
-            'NKR',
-            'NONBRANCH',
-            'OLK',
-            'HEAD NB'
-        ]
-
-        self.branch_column_ids = [
-            'Global_Dimension_1_Code', 
-            'branch_Code', 
-            'branch', 
-            'Branch', 
-            'Branch_code', 
-            'Branch_Code'
-        ]
-        f = open('missing-columns.txt', 'w')
-        f.close()
-
         self.lblSourcePath = wx.StaticText(self.Pan, label='Source Path', pos=(10, 20), size=(70, 20))
         #self.setCustomFont(self.lblSourcePath)
         self.txtSourcePath = wx.TextCtrl(self.Pan, pos=(110, 20), size=(430, 20))
@@ -59,7 +29,6 @@ class Form(wx.Frame):
         self.tcNoColumnFiles = wx.TextCtrl(self.Pan, pos=(110, 160), size=(530, 70), style=wx.TE_MULTILINE|wx.TE_READONLY)
 
         self.btnExtract = wx.Button(self.Pan, id=3, label='Extract', pos=(10, 330), size=(70,20))
-        self.btnExtract.Enable(False)
         self.btnExtract.Bind(wx.EVT_BUTTON, self.evt_selectPath)
 
         self.btnClose = wx.Button(self.Pan, id=4, label='Close', pos=(620, 330), size=(70,20))
@@ -90,45 +59,74 @@ class Form(wx.Frame):
         if button_id == 1:
             dlg = wx.DirDialog(self, message="Select Source Folder")
             if dlg.ShowModal() == wx.ID_OK:
-                self.source_path_selected = True
-                if self.source_path_selected and self.destination_path_selected:
-                    self.btnExtract.Enable(True)
                 dirname = dlg.GetPath()
-                self.output_folders_source_url = dirname
                 self.txtSourcePath.Value = dirname
-                
+                wx.MessageBox(dirname)
             dlg.Destroy()
 
         elif button_id == 2:
             dlg = wx.DirDialog(self, message="Select Destination Folder")
             if dlg.ShowModal() == wx.ID_OK:
-                self.destination_path_selected = True
-                if self.source_path_selected and self.destination_path_selected:
-                    self.btnExtract.Enable(True)
                 dirname = dlg.GetPath()
                 self.txtDestinationPath.Value = dirname
-                self.output_folders_destination_url = dirname
-                
+                wx.MessageBox(dirname)
             dlg.Destroy()
 
         elif button_id == 3:
-            self.startExtraction()
+            pass
     
         elif button_id == 4:
             self.Close()
             
+
     def setCustomFont(self, control):
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         font_clr = wx.Colour(60, 60, 60, alpha=wx.ALPHA_OPAQUE)
         
         #control.SetTextForeground(font_clr)
         control.SetFont(font)
+if __name__ == '__main__':
+    app = wx.App()
+    f = Form().Show()
+    app.MainLoop()
 
-    def startExtraction(self):
-        self.tcProgress.Value = self.tcProgress.Value + '\n' + 'START...'
+class data_cleanup(object):
+    def __init__(self, output_folders_source_url, output_folders_destination_url):
+        self.output_folders_source_url = output_folders_source_url
+        self.output_folders_destination_url = output_folders_destination_url
+
+        f = open('missing-columns.txt', 'w')
+        f.close()
+        
+        self.branches = [
+            'CBD',
+            'ELD',
+            'EMB',
+            'KAWI',
+            'KSM',
+            'MSA',
+            'NBI',
+            'NKR',
+            'NONBRANCH',
+            'OLK',
+            'HEAD NB'
+        ]
+
+        self.branch_column_ids = [
+            'Global_Dimension_1_Code', 
+            'branch_Code', 
+            'branch', 
+            'Branch', 
+            'Branch_code', 
+            'Branch_Code'
+        ]
+
+        #self.create_branch_folders_if()
+
+        print('START...')
         for fl in os.listdir(self.output_folders_source_url):
             source_file_name = ''.join([self.output_folders_source_url, '\\', fl])
-            self.tcProgress.Value = self.tcProgress.Value + '\n' + fl + '...'
+            print(fl + '...')
             for branch in self.branches:
                 #print('    ' + branch + '...')
                 branch_folder_path = ''.join([self.output_folders_destination_url, '\\', branch])
@@ -136,7 +134,7 @@ class Form(wx.Frame):
                     os.mkdir(branch_folder_path)
 
                 self.create_brach_data_cleanup_output_file(branch_folder_path, source_file_name)
-        self.tcProgress.Value = self.tcProgress.Value + '\n' + 'FINISHED!'
+        print('FINISHED!')
     def create_branch_folders_if(self):
         for branch in self.branches:
             fld_path = ''.join([self.output_folders_destination_url, '\\', branch])
@@ -205,10 +203,7 @@ class Form(wx.Frame):
                 writer.save()
                 break
 
-if __name__ == '__main__':
-    app = wx.App()
-    f = Form().Show()
-    app.MainLoop()
+
 # if __name__ == '__main__':
 #     output_folders_source_url = r'C:\_Temp\DataCleanup'
 #     #output_folders_source_url = r'C:\_python\data_cleanup\Source'
