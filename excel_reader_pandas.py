@@ -8,25 +8,83 @@ class Form(wx.Frame):
         wx.Frame.__init__(self, parent=None, title='Data Cleanup', size=(720,400))
         self.Pan = wx.Panel(self, -1)
 
+        f = open('missing-columns.txt', 'w')
+        f.close()
+        
         self.lblSourcePath = wx.StaticText(self.Pan, label='Source Path', pos=(10, 20), size=(70, 20))
+        #self.setCustomFont(self.lblSourcePath)
         self.txtSourcePath = wx.TextCtrl(self.Pan, pos=(110, 20), size=(430, 20))
-        self.btnSelectSourcePath = wx.Button(self.Pan, id=1, label='...', pos=(550, 20), size=(20,20))
-        self.btnSelectSourcePath.Bind(wx.EVT_BUTTON, self.evt_close) #subscribe to the event
+        self.btnSelectSourcePath = wx.Button(self.Pan, id=1, label='...', pos=(545, 20), size=(20,20))
+        self.btnSelectSourcePath.Bind(wx.EVT_BUTTON, self.evt_selectPath)
 
         self.lblDestinationPath = wx.StaticText(self.Pan, label='Destination Path', pos=(10, 45), size=(90, 20))
         self.txtDestinationPath = wx.TextCtrl(self.Pan, pos=(110, 45), size=(430, 20))
-        self.btnSelectDestinationPath = wx.Button(self.Pan, id=1, label='...', pos=(550, 45), size=(20,20))
-        self.btnSelectDestinationPath.Bind(wx.EVT_BUTTON, self.evt_close) #subscribe to the event
+        self.btnSelectDestinationPath = wx.Button(self.Pan, id=2, label='...', pos=(545, 45), size=(20,20))
+        self.btnSelectDestinationPath.Bind(wx.EVT_BUTTON, self.evt_selectPath)
         
         self.lblProgress = wx.StaticText(self.Pan, label='Progress', pos=(10, 80), size=(90, 20))
-        self.tcProgress = wx.TextCtrl(self.Pan, pos=(110, 105), size=(530, 70), style=wx.TE_MULTILINE|wx.TE_READONLY)
+        self.tcProgress = wx.TextCtrl(self.Pan, pos=(110, 80), size=(530, 70), style=wx.TE_MULTILINE|wx.TE_READONLY)
         
-        self.lblNoColumnFiles = wx.StaticText(self.Pan, label='No Column Files', pos=(10, 130), size=(90, 20))
-        self.tcNoColumnFiles = wx.TextCtrl(self.Pan, pos=(110, 105), size=(530, 70), style=wx.TE_MULTILINE|wx.TE_READONLY)
+        self.lblNoColumnFiles = wx.StaticText(self.Pan, label='No Column Files', pos=(10, 160), size=(90, 20))
+        self.tcNoColumnFiles = wx.TextCtrl(self.Pan, pos=(110, 160), size=(530, 70), style=wx.TE_MULTILINE|wx.TE_READONLY)
 
-    def evt_close(self, evt):
-        self.Hide()
+        self.btnExtract = wx.Button(self.Pan, id=3, label='Extract', pos=(10, 330), size=(70,20))
+        self.btnExtract.Bind(wx.EVT_BUTTON, self.evt_selectPath)
 
+        self.btnClose = wx.Button(self.Pan, id=4, label='Close', pos=(620, 330), size=(70,20))
+        self.btnClose.Bind(wx.EVT_BUTTON, self.evt_selectPath)
+
+        self.Pan.Bind(wx.EVT_SIZE, self.Evt_Resize)
+
+    def Evt_Resize(self, evt):
+        nHeight = self.GetSize()[1]
+        nWidth = self.GetSize()[0]
+        
+        width = int((self.GetSize().Width / 2) + 200)
+        self.txtSourcePath.SetSize((width, 20))
+        self.txtDestinationPath.SetSize((width, 20))
+        self.tcProgress.SetSize((width, 70))
+        self.tcNoColumnFiles.SetSize((width, 70))
+
+        button_left = self.txtSourcePath.Position[0] + self.txtSourcePath.Size[0] + 5
+        self.btnSelectSourcePath.SetPosition((button_left, 20))
+        self.btnSelectDestinationPath.SetPosition((button_left, 45))
+
+        self.btnExtract.SetPosition((10, (nHeight -65)))
+        self.btnClose.SetPosition(((nWidth - 100), (nHeight -65)))
+
+    def evt_selectPath(self, evt):
+        button_id = evt.GetId()
+
+        if button_id == 1:
+            dlg = wx.DirDialog(self, message="Select Source Folder")
+            if dlg.ShowModal() == wx.ID_OK:
+                dirname = dlg.GetPath()
+                self.txtSourcePath.Value = dirname
+                wx.MessageBox(dirname)
+            dlg.Destroy()
+
+        elif button_id == 2:
+            dlg = wx.DirDialog(self, message="Select Destination Folder")
+            if dlg.ShowModal() == wx.ID_OK:
+                dirname = dlg.GetPath()
+                self.txtDestinationPath.Value = dirname
+                wx.MessageBox(dirname)
+            dlg.Destroy()
+
+        elif button_id == 3:
+            pass
+    
+        elif button_id == 4:
+            self.Close()
+            
+
+    def setCustomFont(self, control):
+        font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        font_clr = wx.Colour(60, 60, 60, alpha=wx.ALPHA_OPAQUE)
+        
+        #control.SetTextForeground(font_clr)
+        control.SetFont(font)
 if __name__ == '__main__':
     app = wx.App()
     f = Form().Show()
