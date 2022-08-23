@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import warnings
 import wx
+import pythoncom
 
 class Form(wx.Frame):
     def __init__(self):
@@ -14,8 +15,8 @@ class Form(wx.Frame):
 
         self.source_path_selected = False        
         self.destination_path_selected = False
-        f = open('missing-columns.txt', 'w')
-        f.close()
+        # f = open('missing-columns.txt', 'w')
+        # f.close()
         
         self.branches = [
             'CBD',
@@ -28,7 +29,8 @@ class Form(wx.Frame):
             'NKR',
             'NONBRANCH',
             'OLK',
-            'HEAD NB'
+            'HEAD NB',
+            'CHANEXPE'
         ]
 
         self.branch_column_ids = [
@@ -37,10 +39,12 @@ class Form(wx.Frame):
             'branch', 
             'Branch', 
             'Branch_code', 
-            'Branch_Code'
+            'Branch_Code',
+            'Transaction_Branch',
+            'BRANCH'
         ]
-        f = open('missing-columns.txt', 'w')
-        f.close()
+        # f = open('missing-columns.txt', 'w')
+        # f.close()
 
         self.lblSourcePath = wx.StaticText(self.Pan, label='Source Path', pos=(10, 20), size=(70, 20))
         #self.setCustomFont(self.lblSourcePath)
@@ -142,6 +146,7 @@ class Form(wx.Frame):
                     os.mkdir(branch_folder_path)
 
                 self.create_brach_data_cleanup_output_file(branch_folder_path, source_file_name)
+                pythoncom.PumpWaitingMessages()
 
         lc = set(self.lcMissingColumns)
 
@@ -192,10 +197,10 @@ class Form(wx.Frame):
 
                 if return_value['key_found'] == False:
                     #print('Missing Column Headers : ' + source_file_name)
-                    f = open('missing-columns.txt', 'a')
-                    f.writelines(source_file_name +"\n")
                     self.lcMissingColumns.append(source_file_name)
-                    f.close()
+                    # f = open('missing-columns.txt', 'a')
+                    # f.writelines(source_file_name +"\n")
+                    # f.close()
                     break
 
                 branch_name = os.path.basename(branch_folder_path)
@@ -214,7 +219,7 @@ class Form(wx.Frame):
 
                 output_file_name = ''.join([branch_folder_path, '\\', os.path.basename(source_file_name)])
                 writer = pd.ExcelWriter(output_file_name, engine="openpyxl")
-                data_frame.to_excel(writer, sheet_name="Sheet1", index=False)
+                data_frame.to_excel(writer, sheet_name="Sheet1")#, index=False)
                 writer.save()
                 break
 
