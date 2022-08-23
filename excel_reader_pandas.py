@@ -8,6 +8,7 @@ class Form(wx.Frame):
         wx.Frame.__init__(self, parent=None, title='Data Cleanup', size=(720,400))
         self.Pan = wx.Panel(self, -1)
 
+        self.lcMissingColumns = []
         self.output_folders_source_url = ''
         self.output_folders_destination_url = ''
 
@@ -74,8 +75,8 @@ class Form(wx.Frame):
         width = int((self.GetSize().Width / 2) + 200)
         self.txtSourcePath.SetSize((width, 20))
         self.txtDestinationPath.SetSize((width, 20))
-        self.tcProgress.SetSize((width, 70))
-        self.tcNoColumnFiles.SetSize((width, 70))
+        # self.tcProgress.SetSize((width, 70))
+        # self.tcNoColumnFiles.SetSize((width, 70))
 
         button_left = self.txtSourcePath.Position[0] + self.txtSourcePath.Size[0] + 5
         self.btnSelectSourcePath.SetPosition((button_left, 20))
@@ -84,6 +85,11 @@ class Form(wx.Frame):
         self.btnExtract.SetPosition((10, (nHeight -65)))
         self.btnClose.SetPosition(((nWidth - 100), (nHeight -65)))
 
+        self.lblNoColumnFiles.SetPosition((10, int(nHeight/2) + 20))
+        self.tcNoColumnFiles.SetPosition((110, int(nHeight/2) + 20))
+        self.tcNoColumnFiles.SetSize((width, int(nHeight/2 - 90)))
+
+        self.tcProgress.SetSize((width, int(nHeight/2 - 70)))
     def evt_selectPath(self, evt):
         button_id = evt.GetId()
 
@@ -128,7 +134,7 @@ class Form(wx.Frame):
         self.tcProgress.Value = self.tcProgress.Value + '\n' + 'START...'
         for fl in os.listdir(self.output_folders_source_url):
             source_file_name = ''.join([self.output_folders_source_url, '\\', fl])
-            self.tcProgress.Value = self.tcProgress.Value + '\n' + fl + '...'
+            self.tcProgress.Value = self.tcProgress.Value + '\n' + fl
             for branch in self.branches:
                 #print('    ' + branch + '...')
                 branch_folder_path = ''.join([self.output_folders_destination_url, '\\', branch])
@@ -136,6 +142,12 @@ class Form(wx.Frame):
                     os.mkdir(branch_folder_path)
 
                 self.create_brach_data_cleanup_output_file(branch_folder_path, source_file_name)
+
+        lc = set(self.lcMissingColumns)
+
+        for fl in lc:
+            self.tcNoColumnFiles.Value = self.tcNoColumnFiles.Value + '\n' + fl
+
         self.tcProgress.Value = self.tcProgress.Value + '\n' + 'FINISHED!'
     def create_branch_folders_if(self):
         for branch in self.branches:
@@ -182,6 +194,7 @@ class Form(wx.Frame):
                     #print('Missing Column Headers : ' + source_file_name)
                     f = open('missing-columns.txt', 'a')
                     f.writelines(source_file_name +"\n")
+                    self.lcMissingColumns.append(source_file_name)
                     f.close()
                     break
 
