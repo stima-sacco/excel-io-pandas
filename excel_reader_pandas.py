@@ -191,7 +191,8 @@ class Form(wx.Frame):
 
             while True:
                 #source_file_name = ''.join([self.output_folders_source_url, '\\', file_name])
-                df = pd.read_excel(source_file_name, dtype=object, index_col=0)#, engine='openpyxl')
+                #df = pd.read_excel(source_file_name, dtype=object, index_col=0)#, engine='openpyxl')
+                df = pd.read_excel(source_file_name, dtype=object)#, index_col=0)#, engine='openpyxl')
 
                 return_value = self.get_valid_column_key(df)
 
